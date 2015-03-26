@@ -18,3 +18,9 @@ class LargeImageField(FileField):
     are created into tilesets
     """
     attr_class = LargeImageFieldFile
+
+try:
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([], ["^loupe\.fields\.LargeImageField"])
+except ImportError:
+    pass
