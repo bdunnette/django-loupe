@@ -4,9 +4,9 @@ A high resolution image manager for pan and zooming into images
 """
 __version_info__ = {
     'major': 0,
-    'minor': 4,
+    'minor': 5,
     'micro': 0,
-    'releaselevel': 'final',
+    'releaselevel': 'beta',
     'serial': 1
 }
 
