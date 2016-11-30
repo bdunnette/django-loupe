@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
+
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+
 from dirtyfields import DirtyFieldsMixin
 
 from .settings import STORAGE, QUEUED_STORAGE_TASK
@@ -169,12 +171,16 @@ from django.dispatch import receiver
 
 
 @receiver(post_save, sender=LoupeImage)
-def create_external_thumbnail(sender, instance, created, raw, using, *args, **kwargs):
-    if instance.external_tileset_url and not hasattr(instance.thumbnail, 'file'):
+def create_external_thumbnail(sender, instance, created, raw, using, *args,
+                              **kwargs):
+    if (instance.external_tileset_url and
+        not hasattr(instance.thumbnail, 'file')):
         try:
             import tileset
 
-            thumbnail_func = getattr(tileset, 'create_%s_thumbnail' % instance.external_tileset_type)
+            thumbnail_func = getattr(
+                tileset,
+                'create_%s_thumbnail' % instance.external_tileset_type)
             filename, size, content = thumbnail_func(instance.tileset_url)
             instance.thumbnail.save(filename, content)
         except AttributeError:
