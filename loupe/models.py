@@ -4,6 +4,8 @@ import os
 from django.db import models
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from dirtyfields import DirtyFieldsMixin
 
@@ -50,7 +52,7 @@ class BaseLoupeImage(DirtyFieldsMixin, models.Model):
             ('osm', 'Open Street Maps (OSM)'),
             ('tms', 'Tiled Map Service (TMS)'),
             ('zoomify', 'Zoomify'),
-        ), )
+    ), )
     image_height = models.IntegerField(_('image height'),
         blank=True, null=True,
         editable=False)
@@ -145,10 +147,11 @@ class BaseLoupeImage(DirtyFieldsMixin, models.Model):
         """
         Update the metadata if the imageurl changes
         """
+        dirty_fields = self.get_dirty_fields().keys()
         update_metadata = (
-            "image" in self.dirty_fields or
-            "external_tileset_type" in self.dirty_fields or
-            "external_tileset_url" in self.dirty_fields)
+            "image" in dirty_fields or
+            "external_tileset_type" in dirty_fields or
+            "external_tileset_url" in dirty_fields)
         super(BaseLoupeImage, self).save(*args, **kwargs)
         if update_metadata:
             self.update_metadata()
@@ -166,15 +169,10 @@ class LoupeImage(BaseLoupeImage):
         return reverse('loupeimage-detail', kwargs={'slug': self.slug})
 
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
-
 @receiver(post_save, sender=LoupeImage)
 def create_external_thumbnail(sender, instance, created, raw, using, *args,
                               **kwargs):
-    if (instance.external_tileset_url and
-        not hasattr(instance.thumbnail, 'file')):
+    if (instance.external_tileset_url and not hasattr(instance.thumbnail, 'file')):
         try:
             import tileset
 

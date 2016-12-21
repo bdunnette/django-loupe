@@ -6,7 +6,7 @@ A high resolution image manager for pan and zooming into images
 __version_info__ = {
     'major': 0,
     'minor': 5,
-    'micro': 1,
+    'micro': 2,
     'releaselevel': 'final',
     'serial': 1
 }
